@@ -17,29 +17,29 @@ file system.
 In order to pull an image, first we need to go to the docker hub. Say we need to import Redis image. We can try
 writing the command.
 
-``` bash
+```bash
 docker pull redis
 ```
 In this way we are telling docker to give us the latest image.
 
 In order to see all the imgaes in our local device we can give the command
-``` bash
+```bash
 docker image redis
 ```
 
 ## Running images
 Since we have already pulled the redis image let's run the docker image. We can run the docker image simply typing
-``` bash
+```bash
 docker run redis
 ```
 
 In order to see all the running images we can simply type
-``` bash
+```bash
 docker ps
 ```
 
 In order to see all the images whether they are running or not running we can simply type
-``` bash
+```bash
 docker ps -a
 ```
 
@@ -51,19 +51,19 @@ being running.
 Say one does not want to see the log of docker being run and want to run further images in the same terminal window.
 They can run the docker image in detached mode.
 
-``` bash
+```bash
 docker run -d redis
 ```
 After running this command we will see the <CONTAINER_ID> in terminal. If we want stop this image being run we can 
 simply type
 
-``` bash
+```bash
 docker stop <CONTAINER-ID> 
 ```
 
 ## Pulling and Running Docker images simultaneously
 Say we want to run another version of docker image and I don't have the image in my local machine. We can type
-``` bash
+```bash
 docker run redis:7.2.8
 ```
 First it will check the layers of images being already downloaded. It will pull rest of the layers from docker hub.
@@ -81,16 +81,52 @@ redis image comes with 6379 port. We can bind these two containers with two diff
 
 Now let's hop into the commands.
 
-``` bash
+```bash
 docker run -p6000:6379 -d redis
 ```
 
 This command binds local host port 6000 to container port 6379. Now if we want to bind different port number to
 different image of redis we can simply type
 
-``` bash
+```bash
 docker run -p6001:6379 -d redis:7.2.8
 ```
+
+## Debugging a Container
+If we want to see the logs of a running container, we can simply do that using the command
+
+```bash
+docker logs <CONTAINER_ID>
+```
+
+We can also get the logs of a container using the <CONTAINER_NAME>
+
+```bash
+docker logs <CONTAINER_NAME>
+```
+
+Say for some reason you want to change the name of the <CONTAINER_NAME>. We can do that by typing
+
+```bash
+docker run - d -p6001:6379 --name redis-older redis:7.2.8
+```
+
+## Troubleshooting a container
+Say there are two containers running and there are some problems with one of the containers. In order to debug
+we need to get inside that container and want to get access of that terminal. We can do that simply
+
+```bash
+docker exec -it <CONATINER-ID> /bin/bash
+```
+
+We can also do it by using the name only.
+```bash
+docker exec -it <CONTAINER_NAME> /bin/bash
+```
+
+One more thing: We can go back for a bit. The command 'docker run' is always used to fetch a container from
+docker-hub where as 'docker start' is used to start a paused container.
+
 
 
 
