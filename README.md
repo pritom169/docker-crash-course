@@ -38,7 +38,26 @@ In order to see all the running images we can simply type
 docker ps
 ```
 
+In order to see all the images whether they are running or not running we can simply type
+``` bash
+docker ps -a
+```
+
 ### Stopping a docker image
 Stopping a docker image being run is also quite simple. One just can type 'Ctrl+C' inorder to stop the redis image
 being running.
+
+### Running a docker image in detached mode
+Say one does not want to see the log of docker being run and want to run further images in the same terminal window.
+They can run the docker image in detached mode.
+
+``` bash
+docker run -d redis
+```
+After running this command we will see the <CONTAINER_ID> in terminal. If we want stop this image being run we can 
+simply type
+
+``` bash
+docker stop <CONTAINER-ID> 
+```
 
