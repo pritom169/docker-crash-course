@@ -127,6 +127,22 @@ docker exec -it <CONTAINER_NAME> /bin/bash
 One more thing: We can go back for a bit. The command 'docker run' is always used to fetch a container from
 docker-hub where as 'docker start' is used to start a paused container.
 
+## A demo workflow with Docker
+Let's consider a workflow using Docker container.
+
+- A JS application in the local machine uses MongoDB. Rather than installing MongoDB in the local machine we
+download the image from the Docker Hub and install it in the device.
+- Now let's say from our local device we want to ship it to the development environment where a tester can
+test the app.
+- For that we push our app repository to Git.
+- That will trigger a CI (a jenkins build). The CI will build the artifact. From the artifact it will create a
+docker image.
+- Once the docker image is generated, it will get pushed to a private docker repository.
+- Now that docker image needs to be deployed in a development server.
+- Now the development server pulls the image from the private repository
+- It also pulls the Docker image from the docker hub
+- As a result, we have two independent container. One for your own JS application and another for Docker.
+- So if someone enters the Dev server, they will be able to test the app.
 
 
 
