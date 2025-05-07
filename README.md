@@ -24,7 +24,7 @@ In this way we are telling docker to give us the latest image.
 
 In order to see all the imgaes in our local device we can give the command
 ``` bash
-docker images
+docker image redis
 ```
 
 ## Running images
@@ -43,11 +43,11 @@ In order to see all the images whether they are running or not running we can si
 docker ps -a
 ```
 
-### Stopping a docker image
+## Stopping a docker image
 Stopping a docker image being run is also quite simple. One just can type 'Ctrl+C' inorder to stop the redis image
 being running.
 
-### Running a docker image in detached mode
+## Running a docker image in detached mode
 Say one does not want to see the log of docker being run and want to run further images in the same terminal window.
 They can run the docker image in detached mode.
 
@@ -60,4 +60,14 @@ simply type
 ``` bash
 docker stop <CONTAINER-ID> 
 ```
+
+## Pulling and Running Docker images simultaneously
+Say we want to run another version of docker image and I don't have the image in my local machine. We can type
+``` bash
+docker run redis:7.2.8
+```
+First it will check the layers of images being already downloaded. It will pull rest of the layers from docker hub.
+After all the layers are being downloaded, it will start running the container.
+
+
 
