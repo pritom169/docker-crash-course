@@ -69,5 +69,30 @@ docker run redis:7.2.8
 First it will check the layers of images being already downloaded. It will pull rest of the layers from docker hub.
 After all the layers are being downloaded, it will start running the container.
 
+## Port Binding
+As we have seen we have pulled two different version of docker images and running them in our local machine. They
+both are running on port 6379 which was specified in the image.
+
+The problem arises when we want to give access to outer application access to our redis application. However, we can
+do that in a different manner.
+
+The HOST machine docker is hosted has multiple ports. We can attach different ports for our docker images. Say if two
+redis image comes with 6379 port. We can bind these two containers with two different host machine port.
+
+Now let's hop into the commands.
+
+``` bash
+docker run -p6000:6379 -d redis
+```
+
+This command binds local host port 6000 to container port 6379. Now if we want to bind different port number to
+different image of redis we can simply type
+
+``` bash
+docker run -p6001:6379 -d redis:7.2.8
+```
+
+
+
 
 
