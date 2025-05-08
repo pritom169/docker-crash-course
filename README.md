@@ -144,6 +144,23 @@ docker image.
 - As a result, we have two independent container. One for your own JS application and another for Docker.
 - So if someone enters the Dev server, they will be able to test the app.
 
+## Docker Network
+Docker creates it's own isolated Docker network. Docker creates it's own isolated Docker network where the containers
+are running. As a result, when one deploys two container in same Docker network in our case Mongo and Mongo Express, we
+can simply connect them just using their name.
+
+When an application which is outside the docker network in our case Nodejs application conntects via 
+localhost:port-number.
+
+Finally when we will ship the application we will put the node.js, mongo, and mongo-express UI in their
+own container which will reside inside the same docker network.
+
+We can see all the docker network just by typing,
+
+```bash
+docker network ls
+```
+
 
 
 
