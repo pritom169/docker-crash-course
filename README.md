@@ -160,8 +160,9 @@ We can see all the docker network just by typing,
 ```bash
 docker network ls
 ```
+### Create a container for MongoDB
 
-Now let's create one docker network for Mongo. Here is the command
+Now let's create one docker network for MongoDB. Here is the command
 ```bash
 docker run -d \                                                                                           
 > -p 27017:27017 \
@@ -197,3 +198,25 @@ by container name.
 
 - **_mongo_** Specifies which Docker image to use; here it’s the official mongo image from Docker Hub. If you don’t have 
 it locally, Docker will pull it automatically.
+
+### Create a container for Mongo Express
+```bash
+docker run -d \
+> -p 8081:8081 \
+> -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin \
+> -e ME_CONFIG_MONGODB_ADMINPASSWORD=password \
+> --net mongo-network \
+> --name mongo-express \
+> -e ME_CONFIG_MONGODB_SERVER=mongodb \
+> mongo-express
+```
+
+- `docker run -d` - Command for running docker in detached mode
+- `-p 8081:8081` - The port it should bind
+- `-e ME_CONFIG_MONGODB_ADMINUSERNAME=admin -e ME_CONFIG_MONGODB_ADMINPASSWORD=password` - Setting up the environment
+variable for MongoDB
+- `--net mongo-network` - The container should be in the mongo-network. If the network is not created, it will create
+a new network.
+- `--name mongo-express`- The name of the container should be mongo express
+- `-e ME_CONFIG_MONGODB_SERVER=mongodb` - it tells Mongo express about the server (the container name of the server)
+- `mongo-express` - last but not the least we have to mention the image name
