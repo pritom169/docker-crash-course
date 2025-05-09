@@ -161,7 +161,39 @@ We can see all the docker network just by typing,
 docker network ls
 ```
 
+Now let's create one docker network for Mongo. Here is the command
+```bash
+docker run -d \                                                                                           
+> -p 27017:27017 \
+> -e MONGO_INITDB_ROOT_USERNAME=admin \
+> -e MONGO_INITDB_ROOT_PASSWORD=password \
+> --name mongodb \
+> --net mongo-network \
+> mongo
+```
 
+This command launches a MongoDB database inside a Docker container. Let’s break it down piece by piece:
 
+- **_docker run_** - Creates and starts a new container from an image.
 
+- **_-d_** Runs the container in “detached” mode—i.e., in the background—so your terminal isn’t tied up by its output.
 
+- **_-p 27017:27017_** Maps port 27017 of your host machine (the left side) to port 27017 of the container 
+(the right side). MongoDB listens by default on port 27017, so this makes the database accessible at localhost:27017 
+on your computer.
+
+- **_-e MONGO_INITDB_ROOT_USERNAME=admin_** Sets the environment variable MONGO_INITDB_ROOT_USERNAME inside the 
+container to admin. During the first startup, the official MongoDB image uses this to create your root user.
+
+- **_-e MONGO_INITDB_ROOT_PASSWORD=password_** Similarly sets MONGO_INITDB_ROOT_PASSWORD to password. Together with 
+the username, this establishes your admin credentials.
+
+- **_--name mongodb_** Assigns the name mongodb to the running container. You can then refer to it by name in other 
+Docker commands (e.g., docker stop mongodb).
+
+- **_--net mongo-network_** Attaches the container to a user-defined Docker network called mongo-network. This is 
+useful if you have other containers (e.g., an application server) on the same network that need to talk to MongoDB 
+by container name.
+
+- **_mongo_** Specifies which Docker image to use; here it’s the official mongo image from Docker Hub. If you don’t have 
+it locally, Docker will pull it automatically.
