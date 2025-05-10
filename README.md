@@ -261,3 +261,22 @@ Now say we want to stop both of the container. All we have to write
 ```bash
 docker-compose -f mongo.yaml down
 ```
+
+## Creating your own Docker file
+Now Let's say you have developed your JS application. You have finished the testing, now you want to deploy to the
+production.
+
+### What is a Dockerfile?
+Dockerfile is a blueprint for printing Docker images. Here is the code for contenarizing our node.js application.
+
+```dockerfile
+FROM node:23.11.0
+ENV MONGO_DB_USERNAME=admin \
+    MONGO_DB_PWD=password
+
+RUN mkdir -p /home/app
+
+COPY . /home/app
+
+CMD ["node", "server.js"]
+```
