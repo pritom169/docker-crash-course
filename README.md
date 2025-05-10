@@ -220,3 +220,32 @@ a new network.
 - `--name mongo-express`- The name of the container should be mongo express
 - `-e ME_CONFIG_MONGODB_SERVER=mongodb` - it tells Mongo express about the server (the container name of the server)
 - `mongo-express` - last but not the least we have to mention the image name
+
+## Docker compose
+As we have seen we have manually set up the commands for Docker, however doing this everytime and setting up things
+manually is quite cumbersome. Here comes Docker Compose.
+
+In few words, Docker compose is a structured way to format Docker commands. Since Docker Compose happens in a .yaml,
+file it is much convenient edit.
+
+Here is the transferred content of what we had already written in a file name `mongo.yaml`:
+
+```yaml
+version: "3"
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8080:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+```
