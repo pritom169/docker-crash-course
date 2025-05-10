@@ -278,5 +278,23 @@ RUN mkdir -p /home/app
 
 COPY . /home/app
 
-CMD ["node", "server.js"]
+CMD ["node", "/home/app/server.js"]
+```
+
+Now let's build the image. We can simply type:
+```bash
+docker build -t my-app:1.0 .
+```
+- `-t` - stands for tag
+- `.`- stands
+
+Since the image is created we cash start the image by
+```bash
+docker run --network demo-nodejs-app_default \
+  -e MONGO_DB_HOST=mongodb \
+  -e MONGO_DB_USERNAME=admin \
+  -e MONGO_DB_PWD=password \
+  -e MONGO_DB_NAME=my-db \
+  -p 3000:3000 \
+  my-app:1.0
 ```
