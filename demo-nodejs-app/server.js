@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 // Default port for MongoDB in Docker is typically mapped to 27017
 // If using Docker Compose, the hostname would be the service name
 const mongoURI = process.env.MONGO_URI || 'mongodb://admin:password@localhost:27017';
-const dbName = process.env.MONGO_DB_NAME || 'user-account';
+const dbName = process.env.MONGO_DB_NAME || 'my-db';
 let db;
 
 // Middleware

@@ -249,3 +249,15 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongodb
 ```
+
+In order to start the file we should type the command 
+
+```bash
+docker-compose -f mongo.yaml up
+```
+
+Now say we want to stop both of the container. All we have to write
+
+```bash
+docker-compose -f mongo.yaml down
+```
