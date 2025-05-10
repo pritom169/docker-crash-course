@@ -10,11 +10,17 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// MongoDB connection string for Docker container
-// Default port for MongoDB in Docker is typically mapped to 27017
-// If using Docker Compose, the hostname would be the service name
-const mongoURI = process.env.MONGO_URI || 'mongodb://admin:password@localhost:27017';
+// MongoDB connection string - Modified to use authentication database
+const mongoHost = process.env.MONGO_DB_HOST || 'localhost';
+const mongoUser = process.env.MONGO_DB_USERNAME;
+const mongoPwd = process.env.MONGO_DB_PWD;
 const dbName = process.env.MONGO_DB_NAME || 'my-db';
+
+// Use the admin database for authentication with proper URI format
+const mongoURI = `mongodb://${mongoUser}:${mongoPwd}@${mongoHost}:27017/${dbName}?authSource=admin`;
+
+console.log(`Attempting to connect to MongoDB at: ${mongoHost}`); // Log the host for debugging
+
 let db;
 
 // Middleware
@@ -25,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Connect to MongoDB
 async function connectToMongo() {
   try {
+    console.log('Connecting to MongoDB with URI:', mongoURI.replace(mongoPwd, '******')); // Log URI but hide password
     const client = new MongoClient(mongoURI);
     await client.connect();
     console.log('Connected to MongoDB successfully');
@@ -90,10 +97,10 @@ app.post('/api/user', async (req, res) => {
   }
 });
 
-// API endpoint to get all persons
+// API endpoint to get all persons - fixed collection name to match the one used in POST
 app.get('/api/persons', async (req, res) => {
   try {
-    const persons = await db.collection('persons').find().toArray();
+    const persons = await db.collection('users').find().toArray();
     res.json(persons);
   } catch (error) {
     console.error('Error fetching persons data:', error);
@@ -101,7 +108,7 @@ app.get('/api/persons', async (req, res) => {
   }
 });
 
-// API endpoint to get a single person by ID
+// API endpoint to get a single person by ID - fixed collection name to match
 app.get('/api/person/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -110,7 +117,7 @@ app.get('/api/person/:id', async (req, res) => {
       return res.status(400).json({ error: 'Invalid ID format' });
     }
     
-    const person = await db.collection('persons').findOne({ _id: new ObjectId(id) });
+    const person = await db.collection('users').findOne({ _id: new ObjectId(id) });
     
     if (!person) {
       return res.status(404).json({ error: 'Person not found' });
