@@ -19,8 +19,6 @@ const dbName = process.env.MONGO_DB_NAME || 'my-db';
 // Use the admin database for authentication with proper URI format
 const mongoURI = `mongodb://${mongoUser}:${mongoPwd}@${mongoHost}:27017/${dbName}?authSource=admin`;
 
-console.log(`Attempting to connect to MongoDB at: ${mongoHost}`); // Log the host for debugging
-
 let db;
 
 // Middleware

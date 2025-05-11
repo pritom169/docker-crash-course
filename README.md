@@ -286,7 +286,7 @@ Now let's build the image. We can simply type:
 docker build -t my-app:1.0 .
 ```
 - `-t` - stands for tag
-- `.`- stands
+- `.` - stands
 
 Since the image is created we cash start the image by
 ```bash
@@ -297,4 +297,30 @@ docker run --network demo-nodejs-app_default \
   -e MONGO_DB_NAME=my-db \
   -p 3000:3000 \
   my-app:1.0
+```
+
+## Docker Private Repository
+Now let's create a private repository for docker images on Amazon ECR.
+
+### Image naming in Docker registries
+- In DockerHub:
+  - When we pull an image from we type `docker pull <IMAGENAME:tag>`
+  - However in reality what is happening, it's pulling then image from `docker pull docker.io/<IMAGENAME:tag>`
+
+- In Reality:
+  - When we pull an image from AWS we type `docker pull awsurl/my-app:1.0`
+
+Now in order to push the docker image to AWS we can simply type
+```bash
+docker push <AWSURL/IMAGENAME:TAG>
+```
+
+Now let's say we want to change some codes or some other settings of our repository. Say we have changed codes.
+Now if we want to push this to the AWS repository we need to do something. First we need to tag. Tagging does not
+create a new image or push to the AWS ECR repo. However, it creates a reference of a new image. It is necessary because
+before push to AWS ECR docker needs to know where to send the image.
+
+Tagging command is following:
+```bash
+docker tag <APP_NAME:NEW_TAG> <AWS_URL:APP_NAME/NEW_TAG> 
 ```
