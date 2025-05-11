@@ -324,3 +324,8 @@ Tagging command is following:
 ```bash
 docker tag <APP_NAME:NEW_TAG> <AWS_URL:APP_NAME/NEW_TAG> 
 ```
+
+Pushing command is following:
+```bash
+docker push <AWS_URL:APP_NAME/NEW_TAG>
+```
