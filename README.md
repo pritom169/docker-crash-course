@@ -320,9 +320,14 @@ Now if we want to push this to the AWS repository we need to do something. First
 create a new image or push to the AWS ECR repo. However, it creates a reference of a new image. It is necessary because
 before push to AWS ECR docker needs to know where to send the image.
 
+First we have to build the image. The command is following:
+```bash
+docker compose -f mongo.yaml up
+```
+
 Tagging command is following:
 ```bash
-docker tag <APP_NAME:NEW_TAG> <AWS_URL:APP_NAME/NEW_TAG> 
+docker tag <APP_NAME:NEW_TAG> <AWS_URL/APP_NAME:NEW_TAG> 
 ```
 
 Pushing command is following:
