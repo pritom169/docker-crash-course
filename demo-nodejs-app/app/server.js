@@ -1,147 +1,80 @@
-// server.js
-require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const { MongoClient, ObjectId } = require('mongodb');
-const path = require('path');
+let express = require('express');
+let path = require('path');
+let fs = require('fs');
+let MongoClient = require('mongodb').MongoClient;
+let bodyParser = require('body-parser');
+let app = express();
 
-// Initialize express app
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// MongoDB connection string - Modified to use authentication database
-const mongoHost = process.env.MONGO_DB_HOST || 'localhost';
-const mongoUser = process.env.MONGO_DB_USERNAME;
-const mongoPwd = process.env.MONGO_DB_PWD;
-const dbName = process.env.MONGO_DB_NAME || 'my-db';
-
-// Use the admin database for authentication with proper URI format
-const mongoURI = `mongodb://${mongoUser}:${mongoPwd}@${mongoHost}:27017/${dbName}?authSource=admin`;
-
-let db;
-
-// Middleware
-app.use(cors());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Connect to MongoDB
-async function connectToMongo() {
-  try {
-    console.log('Connecting to MongoDB with URI:', mongoURI.replace(mongoPwd, '******')); // Log URI but hide password
-    const client = new MongoClient(mongoURI);
-    await client.connect();
-    console.log('Connected to MongoDB successfully');
-    db = client.db(dbName);
-    
-    // Create collection if it doesn't exist
-    if (!await db.listCollections({ name: 'users' }).hasNext()) {
-      await db.createCollection('users');
-      console.log('Created users collection');
-    }
-    
-    return client;
-  } catch (error) {
-    console.error('Failed to connect to MongoDB:', error);
-    process.exit(1);
-  }
-}
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, "index.html"));
+  });
 
-// API endpoint to save person information
-app.post('/api/user', async (req, res) => {
-  try {
-    const { name, email, description } = req.body;
-    
-    // Basic validation
-    if (!name || !email || !description) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Invalid email format' });
-    }
-    
-    // Check if email already exists
-    const existingPerson = await db.collection('users').findOne({ email });
-    if (existingPerson) {
-      return res.status(400).json({ error: 'A person with this email already exists' });
-    }
-    
-    // Create new person document
-    const newPerson = {
-      name,
-      email,
-      description,
-      createdAt: new Date()
-    };
-    
-    // Insert into MongoDB
-    const result = await db.collection('users').insertOne(newPerson);
-    
-    // Return success response
-    res.status(201).json({ 
-      message: 'Person added successfully', 
-      person: {
-        ...newPerson,
-        _id: result.insertedId
-      }
+app.get('/profile-picture', function (req, res) {
+  let img = fs.readFileSync(path.join(__dirname, "images/image-1.png"));
+  res.writeHead(200, {'Content-Type': 'image/jpg' });
+  res.end(img, 'binary');
+});
+
+// use when starting application locally
+let mongoUrlLocal = "mongodb://admin:password@localhost:27017";
+
+// use when starting application as docker container
+let mongoUrlDocker = "mongodb://admin:password@mongodb";
+
+// pass these options to mongo client connect request to avoid DeprecationWarning for current Server Discovery and Monitoring engine
+let mongoClientOptions = { useNewUrlParser: true, useUnifiedTopology: true };
+
+// "user-account" in demo with docker. "my-db" in demo with docker-compose
+let databaseName = "my-db";
+
+app.post('/update-profile', function (req, res) {
+  let userObj = req.body;
+
+  MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
+    if (err) throw err;
+
+    let db = client.db(databaseName);
+    userObj['userid'] = 1;
+
+    let myquery = { userid: 1 };
+    let newvalues = { $set: userObj };
+
+    db.collection("users").updateOne(myquery, newvalues, {upsert: true}, function(err, res) {
+      if (err) throw err;
+      client.close();
     });
-  } catch (error) {
-    console.error('Error saving person data:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
-// API endpoint to get all persons - fixed collection name to match the one used in POST
-app.get('/api/persons', async (req, res) => {
-  try {
-    const persons = await db.collection('users').find().toArray();
-    res.json(persons);
-  } catch (error) {
-    console.error('Error fetching persons data:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// API endpoint to get a single person by ID - fixed collection name to match
-app.get('/api/person/:id', async (req, res) => {
-  try {
-    const id = req.params.id;
-    
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid ID format' });
-    }
-    
-    const person = await db.collection('users').findOne({ _id: new ObjectId(id) });
-    
-    if (!person) {
-      return res.status(404).json({ error: 'Person not found' });
-    }
-    
-    res.json(person);
-  } catch (error) {
-    console.error('Error fetching person data:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Start the server only after connecting to MongoDB
-async function startServer() {
-  const client = await connectToMongo();
-  
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
   });
-  
-  // Handle process termination
-  process.on('SIGINT', async () => {
-    await client.close();
-    console.log('MongoDB connection closed');
-    process.exit(0);
-  });
-}
+  // Send response
+  res.send(userObj);
+});
 
-startServer();
+app.get('/get-profile', function (req, res) {
+  let response = {};
+  // Connect to the db
+  MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
+    if (err) throw err;
+
+    let db = client.db(databaseName);
+
+    let myquery = { userid: 1 };
+
+    db.collection("users").findOne(myquery, function (err, result) {
+      if (err) throw err;
+      response = result;
+      client.close();
+
+      // Send response
+      res.send(response ? response : {});
+    });
+  });
+});
+
+app.listen(3000, function () {
+  console.log("app listening on port 3000!");
+});

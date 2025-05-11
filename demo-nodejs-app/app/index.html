@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+        .profile-info {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .profile-info p {
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .profile-info span {
+            font-weight: bold;
+        }
+        form {
+            width: 100%;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="email"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Profile</h1>
+    
+    <div class="profile-container">
+        <img src="/profile-picture" alt="Profile Picture" class="profile-picture">
+        <h2 id="profile-name">Loading...</h2>
+        
+        <div class="profile-info">
+            <p><span>Email:</span> <span id="profile-email">Loading...</span></p>
+            <p><span>Interest:</span> <span id="profile-interest">Loading...</span></p>
+            <p><span>About:</span> <span id="profile-about">Loading...</span></p>
+        </div>
+    </div>
+    
+    <h2>Update Profile</h2>
+    <form id="profile-form">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="interest">Interest:</label>
+            <input type="text" id="interest" name="interest">
+        </div>
+        <div class="form-group">
+            <label for="about">About Me:</label>
+            <textarea id="about" name="about" rows="4"></textarea>
+        </div>
+        <button type="submit">Update Profile</button>
+    </form>
+    
+    <div id="message" class="message" style="display: none;"></div>
+
+    <script>
+        // Fetch profile data when page loads
+        document.addEventListener('DOMContentLoaded', fetchProfile);
+
+        function fetchProfile() {
+            fetch('/get-profile')
+                .then(response => response.json())
+                .then(data => {
+                    // Update profile display
+                    document.getElementById('profile-name').textContent = data.name || 'No Name Set';
+                    document.getElementById('profile-email').textContent = data.email || 'No Email Set';
+                    document.getElementById('profile-interest').textContent = data.interest || 'No Interest Set';
+                    document.getElementById('profile-about').textContent = data.about || 'No Information Provided';
+                    
+                    // Populate form fields
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('email').value = data.email || '';
+                    document.getElementById('interest').value = data.interest || '';
+                    document.getElementById('about').value = data.about || '';
+                })
+                .catch(error => {
+                    console.error('Error fetching profile:', error);
+                    showMessage('Failed to load profile data.', 'error');
+                });
+        }
+
+        // Handle form submission
+        document.getElementById('profile-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                interest: document.getElementById('interest').value,
+                about: document.getElementById('about').value
+            };
+            
+            // Send the update request
+            fetch('/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('Profile updated successfully!', 'success');
+                fetchProfile(); // Refresh the profile display
+            })
+            .catch(error => {
+                console.error('Error updating profile:', error);
+                showMessage('Failed to update profile.', 'error');
+            });
+        });
+        
+        // Display messages to the user
+        function showMessage(message, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+            messageElement.className = 'message ' + type;
+            messageElement.style.display = 'block';
+            
+            // Hide the message after 3 seconds
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
